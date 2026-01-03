@@ -1,4 +1,4 @@
-#include "../pipx.h"
+#include "../pipex.h"
 #include "../libft/libft.h"
 
 void	error_exit(char *message)

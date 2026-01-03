@@ -1,4 +1,4 @@
-#include "../pipx.h"
+#include "../pipex.h"
 #include "../libft/libft.h"
 
 char	**parse_command(char *cmd)

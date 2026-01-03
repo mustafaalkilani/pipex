@@ -1,4 +1,4 @@
-#include "../pipx.h"
+#include "../pipex.h"
 #include "../libft/libft.h"
 
 int	open_output_file_append(char *filename)

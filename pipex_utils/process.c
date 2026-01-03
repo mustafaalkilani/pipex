@@ -1,4 +1,4 @@
-#include "../pipx.h"
+#include "../pipex.h"
 #include "../libft/libft.h"
 
 pid_t	execute_first_command(char **argv, int *pipefd, char **envp)

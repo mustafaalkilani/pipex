@@ -6,11 +6,11 @@
 /*   By: mustafa <mustafa@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 00:00:00 by malkilan          #+#    #+#             */
-/*   Updated: 2026/01/03 00:00:00 by mustafa          ###   ########.fr       */
+/*   Updated: 2026/01/03 16:54:47 by mustafa          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipx.h"
+#include "pipex.h"
 #include "libft/libft.h"
 
 void	validate_arguments(int argc)

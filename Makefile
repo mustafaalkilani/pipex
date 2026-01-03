@@ -6,7 +6,7 @@
 #    By: mustafa <mustafa@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/02 00:00:00 by malkilan          #+#    #+#              #
-#    Updated: 2026/01/03 01:46:34 by mustafa          ###   ########.fr        #
+#    Updated: 2026/01/03 16:56:51 by mustafa          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,11 +25,11 @@ LIBFT_DIR   = libft
 LIBFT       = $(LIBFT_DIR)/libft.a
 
 SRCS        = main.c \
-              pipx/process.c \
-              pipx/file_operations.c \
-              pipx/command_parsing.c \
-              pipx/error_handling.c \
-              pipx/utils.c
+              pipex_utils/process.c \
+              pipex_utils/file_operations.c \
+              pipex_utils/command_parsing.c \
+              pipex_utils/error_handling.c \
+              pipex_utils/utils.c
 
 BONUS_SRCS  = $(SRCS) \
               bonus/process_bonus.c \
