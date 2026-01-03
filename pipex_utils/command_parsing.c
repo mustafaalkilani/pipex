@@ -42,6 +42,8 @@ char	*get_command_path(char *cmd, char **envp)
 	char	**paths;
 	char	*result;
 
+	if (!cmd)
+		return (NULL);
 	if (ft_strchr(cmd, '/') != NULL)
 	{
 		if (access(cmd, X_OK) == 0)
@@ -64,6 +66,8 @@ char	*get_env_variable(char *name, char **envp)
 	int	len;
 	int	i;
 
+	if (!name || !envp)
+		return (NULL);
 	len = ft_strlen(name);
 	i = 0;
 	while (envp[i])

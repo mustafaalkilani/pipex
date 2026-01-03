@@ -11,17 +11,18 @@ pid_t	execute_first_command(char **argv, int *pipefd, char **envp)
 		error_exit("fork");
 	if (pid == 0)
 	{
+		close(pipefd[0]);
 		fd_in = open_input_file(argv[1]);
 		if (fd_in == -1)
 		{
-			close(pipefd[0]);
 			close(pipefd[1]);
 			exit(1);
 		}
-		dup2(fd_in, 0);
+		if (dup2(fd_in, STDIN_FILENO) == -1)
+			error_exit("dup2");
 		close(fd_in);
-		dup2(pipefd[1], 1);
-		close(pipefd[0]);
+		if (dup2(pipefd[1], STDOUT_FILENO) == -1)
+			error_exit("dup2");
 		close(pipefd[1]);
 		execute_command(argv[2], envp);
 	}
@@ -38,21 +39,44 @@ pid_t	execute_second_command(char **argv, int *pipefd, char **envp)
 		error_exit("fork");
 	if (pid == 0)
 	{
+		close(pipefd[1]);
 		fd_out = open_output_file(argv[4]);
 		if (fd_out == -1)
 		{
 			close(pipefd[0]);
-			close(pipefd[1]);
 			exit(1);
 		}
-		dup2(pipefd[0], 0);
-		dup2(fd_out, 1);
+		if (dup2(pipefd[0], STDIN_FILENO) == -1)
+			error_exit("dup2");
+		if (dup2(fd_out, STDOUT_FILENO) == -1)
+			error_exit("dup2");
 		close(fd_out);
 		close(pipefd[0]);
-		close(pipefd[1]);
 		execute_command(argv[3], envp);
 	}
 	return (pid);
+}
+
+static void	handle_path_command_error(char **cmd_args)
+{
+	if (access(cmd_args[0], F_OK) != 0)
+	{
+		ft_putstr_fd("pipex: ", 2);
+		ft_putstr_fd(cmd_args[0], 2);
+		ft_putstr_fd(": No such file or directory\n", 2);
+		free_split(cmd_args);
+		exit(127);
+	}
+	if (access(cmd_args[0], X_OK) != 0)
+	{
+		ft_putstr_fd("pipex: ", 2);
+		ft_putstr_fd(cmd_args[0], 2);
+		ft_putstr_fd(": Permission denied\n", 2);
+		free_split(cmd_args);
+		exit(126);
+	}
+	free_split(cmd_args);
+	exit(127);
 }
 
 void	execute_command(char *cmd, char **envp)
@@ -79,16 +103,10 @@ void	execute_command(char *cmd, char **envp)
 			free_split(cmd_args);
 			exit(127);
 		}
-		if (access(cmd_args[0], F_OK) == 0)
-		{
-			free_split(cmd_args);
-			exit(126);
-		}
-		free_split(cmd_args);
-		exit(127);
+		handle_path_command_error(cmd_args);
 	}
 	execve(cmd_path, cmd_args, envp);
-	perror("execve");
+	perror("pipex");
 	free_split(cmd_args);
 	free(cmd_path);
 	exit(126);

@@ -6,7 +6,7 @@
 #    By: mustafa <mustafa@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/02 00:00:00 by malkilan          #+#    #+#              #
-#    Updated: 2026/01/03 16:56:51 by mustafa          ###   ########.fr        #
+#    Updated: 2026/01/03 23:57:21 by mustafa          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@
 # **************************************************************************** #
 
 NAME        = pipex
-BONUS_NAME  = pipex
+BONUS_NAME  = pipex_bonus
 
 CC          = cc
 CFLAGS      = -Wall -Wextra -Werror
@@ -31,10 +31,16 @@ SRCS        = main.c \
               pipex_utils/error_handling.c \
               pipex_utils/utils.c
 
-BONUS_SRCS  = $(SRCS) \
+BONUS_SRCS  = bonus/main_bonus.c \
+              pipex_utils/process.c \
+              pipex_utils/file_operations.c \
+              pipex_utils/command_parsing.c \
+              pipex_utils/error_handling.c \
+              pipex_utils/utils.c \
               bonus/process_bonus.c \
               bonus/file_operations_bonus.c \
-              get_next_line/get_next_line.c
+              get_next_line/get_next_line.c \
+              get_next_line/get_next_line_utils.c
 
 OBJS        = $(SRCS:.c=.o)
 BONUS_OBJS  = $(BONUS_SRCS:.c=.o)

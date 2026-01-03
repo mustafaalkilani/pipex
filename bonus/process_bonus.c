@@ -32,24 +32,35 @@ static void	close_all_pipes(int **pipes, int pipe_count)
 	}
 }
 
-static void	wait_all_children(pid_t *pids, int cmd_count)
+static int	wait_all_children(pid_t *pids, int cmd_count)
 {
 	int	status;
+	int	last_status;
 	int	i;
 
+	last_status = 0;
 	i = 0;
 	while (i < cmd_count)
 	{
 		waitpid(pids[i], &status, 0);
+		if (i == cmd_count - 1)
+		{
+			if (WIFEXITED(status))
+				last_status = WEXITSTATUS(status);
+			else
+				last_status = 1;
+		}
 		i++;
 	}
+	return (last_status);
 }
 
-void	execute_multiple_commands(int argc, char **argv,
+int	execute_multiple_commands(int argc, char **argv,
 			int **pipes, char **envp)
 {
 	int		cmd_count;
 	pid_t	*pids;
+	int		exit_status;
 
 	cmd_count = argc - 3;
 	pids = malloc(sizeof(pid_t) * cmd_count);
@@ -57,8 +68,9 @@ void	execute_multiple_commands(int argc, char **argv,
 		error_exit("malloc");
 	fork_all_commands(cmd_count, argv, pipes, envp, pids);
 	close_all_pipes(pipes, cmd_count - 1);
-	wait_all_children(pids, cmd_count);
+	exit_status = wait_all_children(pids, cmd_count);
 	free(pids);
+	return (exit_status);
 }
 
 static void	close_all_pipes_in_child(int **pipes, int pipe_count)
@@ -74,21 +86,27 @@ static void	close_all_pipes_in_child(int **pipes, int pipe_count)
 	}
 }
 
-static void	setup_input(int index, char **argv, int **pipes)
+static void	setup_input(int index, char **argv, int **pipes, int cmd_count)
 {
 	int	fd_in;
 
 	if (index == 0)
 	{
 		fd_in = open_input_file(argv[1]);
-		if (fd_in != -1)
+		if (fd_in == -1)
 		{
-			dup2(fd_in, STDIN_FILENO);
-			close(fd_in);
+			close_all_pipes_in_child(pipes, cmd_count - 1);
+			exit(1);
 		}
+		if (dup2(fd_in, STDIN_FILENO) == -1)
+			error_exit("dup2");
+		close(fd_in);
 	}
 	else
-		dup2(pipes[index - 1][0], STDIN_FILENO);
+	{
+		if (dup2(pipes[index - 1][0], STDIN_FILENO) == -1)
+			error_exit("dup2");
+	}
 }
 
 static void	setup_output(int index, int cmd_count, char **argv, int **pipes)
@@ -98,20 +116,35 @@ static void	setup_output(int index, int cmd_count, char **argv, int **pipes)
 	if (index == cmd_count - 1)
 	{
 		fd_out = open_output_file(argv[cmd_count + 2]);
-		dup2(fd_out, STDOUT_FILENO);
+		if (fd_out == -1)
+			exit(1);
+		if (dup2(fd_out, STDOUT_FILENO) == -1)
+			error_exit("dup2");
 		close(fd_out);
 	}
 	else
-		dup2(pipes[index][1], STDOUT_FILENO);
+	{
+		if (dup2(pipes[index][1], STDOUT_FILENO) == -1)
+			error_exit("dup2");
+	}
 }
 
 void	execute_command_at_index(int index, int cmd_count,
 			char **argv, int **pipes, char **envp)
 {
-	setup_input(index, argv, pipes);
+	setup_input(index, argv, pipes, cmd_count);
 	setup_output(index, cmd_count, argv, pipes);
 	close_all_pipes_in_child(pipes, cmd_count - 1);
 	execute_command(argv[2 + index], envp);
+}
+
+static void	clear_gnl_stash(void)
+{
+	char	*line;
+
+	line = get_next_line(-1);
+	if (line)
+		free(line);
 }
 
 void	handle_here_doc(char *limiter, int *temp_pipefd)
@@ -136,5 +169,6 @@ void	handle_here_doc(char *limiter, int *temp_pipefd)
 		free(line);
 		ft_putstr_fd("heredoc> ", STDOUT_FILENO);
 	}
+	clear_gnl_stash();
 	close(temp_pipefd[1]);
 }
