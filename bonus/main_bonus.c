@@ -71,7 +71,6 @@ static int	run_here_doc_mode(int argc, char **argv, char **envp)
 	int	**pipes;
 	int	cmd_count;
 	int	pipe_count;
-	int	fd_out;
 	int	exit_status;
 
 	if (argc < 6)
@@ -82,10 +81,8 @@ static int	run_here_doc_mode(int argc, char **argv, char **envp)
 	cmd_count = argc - 4;
 	pipe_count = cmd_count - 1;
 	setup_here_doc_stdin(argv[2]);
-	fd_out = open_output_file_append(argv[argc - 1]);
-	close(fd_out);
 	pipes = create_pipes(pipe_count);
-	exit_status = execute_multiple_commands(argc - 1, argv + 1, pipes, envp);
+	exit_status = execute_multiple_commands(argc - 1, argv + 1, pipes, envp, 1);
 	free_pipes(pipes, pipe_count);
 	return (exit_status);
 }
@@ -105,7 +102,7 @@ static int	run_normal_mode(int argc, char **argv, char **envp)
 	cmd_count = argc - 3;
 	pipe_count = cmd_count - 1;
 	pipes = create_pipes(pipe_count);
-	exit_status = execute_multiple_commands(argc, argv, pipes, envp);
+	exit_status = execute_multiple_commands(argc, argv, pipes, envp, 0);
 	free_pipes(pipes, pipe_count);
 	return (exit_status);
 }

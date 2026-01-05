@@ -54,9 +54,9 @@ void	free_split(char **split);
 
 /* process_bonus.c */
 int		execute_multiple_commands(int argc, char **argv,
-			int **pipes, char **envp);
+			int **pipes, char **envp, int is_here_doc);
 void	execute_command_at_index(int index, int cmd_count,
-			char **argv, int **pipes, char **envp);
+			char **argv, int **pipes, char **envp, int is_here_doc);
 void	handle_here_doc(char *limiter, int *temp_pipefd);
 
 /* file_operations_bonus.c */

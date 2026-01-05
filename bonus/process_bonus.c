@@ -3,7 +3,7 @@
 #include "../get_next_line/get_next_line.h"
 
 static void	fork_all_commands(int cmd_count, char **argv,
-				int **pipes, char **envp, pid_t *pids)
+				int **pipes, char **envp, pid_t *pids, int is_here_doc)
 {
 	int	i;
 
@@ -14,7 +14,8 @@ static void	fork_all_commands(int cmd_count, char **argv,
 		if (pids[i] == -1)
 			error_exit("fork");
 		if (pids[i] == 0)
-			execute_command_at_index(i, cmd_count, argv, pipes, envp);
+			execute_command_at_index(i, cmd_count, argv, pipes, envp,
+				is_here_doc);
 		i++;
 	}
 }
@@ -56,7 +57,7 @@ static int	wait_all_children(pid_t *pids, int cmd_count)
 }
 
 int	execute_multiple_commands(int argc, char **argv,
-			int **pipes, char **envp)
+			int **pipes, char **envp, int is_here_doc)
 {
 	int		cmd_count;
 	pid_t	*pids;
@@ -66,7 +67,7 @@ int	execute_multiple_commands(int argc, char **argv,
 	pids = malloc(sizeof(pid_t) * cmd_count);
 	if (!pids)
 		error_exit("malloc");
-	fork_all_commands(cmd_count, argv, pipes, envp, pids);
+	fork_all_commands(cmd_count, argv, pipes, envp, pids, is_here_doc);
 	close_all_pipes(pipes, cmd_count - 1);
 	exit_status = wait_all_children(pids, cmd_count);
 	free(pids);
@@ -86,12 +87,15 @@ static void	close_all_pipes_in_child(int **pipes, int pipe_count)
 	}
 }
 
-static void	setup_input(int index, char **argv, int **pipes, int cmd_count)
+static void	setup_input(int index, char **argv, int **pipes,
+		int cmd_count, int is_here_doc)
 {
 	int	fd_in;
 
 	if (index == 0)
 	{
+		if (is_here_doc)
+			return ;
 		fd_in = open_input_file(argv[1]);
 		if (fd_in == -1)
 		{
@@ -109,13 +113,17 @@ static void	setup_input(int index, char **argv, int **pipes, int cmd_count)
 	}
 }
 
-static void	setup_output(int index, int cmd_count, char **argv, int **pipes)
+static void	setup_output(int index, int cmd_count, char **argv,
+		int **pipes, int is_here_doc)
 {
 	int	fd_out;
 
 	if (index == cmd_count - 1)
 	{
-		fd_out = open_output_file(argv[cmd_count + 2]);
+		if (is_here_doc)
+			fd_out = open_output_file_append(argv[cmd_count + 2]);
+		else
+			fd_out = open_output_file(argv[cmd_count + 2]);
 		if (fd_out == -1)
 			exit(1);
 		if (dup2(fd_out, STDOUT_FILENO) == -1)
@@ -130,21 +138,12 @@ static void	setup_output(int index, int cmd_count, char **argv, int **pipes)
 }
 
 void	execute_command_at_index(int index, int cmd_count,
-			char **argv, int **pipes, char **envp)
+			char **argv, int **pipes, char **envp, int is_here_doc)
 {
-	setup_input(index, argv, pipes, cmd_count);
-	setup_output(index, cmd_count, argv, pipes);
+	setup_input(index, argv, pipes, cmd_count, is_here_doc);
+	setup_output(index, cmd_count, argv, pipes, is_here_doc);
 	close_all_pipes_in_child(pipes, cmd_count - 1);
 	execute_command(argv[2 + index], envp);
-}
-
-static void	clear_gnl_stash(void)
-{
-	char	*line;
-
-	line = get_next_line(-1);
-	if (line)
-		free(line);
 }
 
 void	handle_here_doc(char *limiter, int *temp_pipefd)
@@ -153,22 +152,21 @@ void	handle_here_doc(char *limiter, int *temp_pipefd)
 	int		limiter_len;
 
 	limiter_len = ft_strlen(limiter);
-	ft_putstr_fd("heredoc> ", STDOUT_FILENO);
+	ft_putstr_fd("heredoc> ", STDERR_FILENO);
 	while (1)
 	{
 		line = get_next_line(STDIN_FILENO);
 		if (!line)
 			break ;
 		if (ft_strncmp(line, limiter, limiter_len) == 0
-			&& line[limiter_len] == '\n')
+			&& (line[limiter_len] == '\n' || line[limiter_len] == '\0'))
 		{
 			free(line);
 			break ;
 		}
 		ft_putstr_fd(line, temp_pipefd[1]);
 		free(line);
-		ft_putstr_fd("heredoc> ", STDOUT_FILENO);
+		ft_putstr_fd("heredoc> ", STDERR_FILENO);
 	}
-	clear_gnl_stash();
 	close(temp_pipefd[1]);
 }
