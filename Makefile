@@ -15,7 +15,7 @@
 # **************************************************************************** #
 
 NAME        = pipex
-BONUS_NAME  = pipex_bonus
+BONUS_NAME  = pipex
 
 CC          = cc
 CFLAGS      = -Wall -Wextra -Werror
@@ -38,6 +38,9 @@ BONUS_SRCS  = bonus/main_bonus.c \
               pipex_utils/error_handling.c \
               pipex_utils/utils.c \
               bonus/process_bonus.c \
+              bonus/child_process_bonus.c \
+              bonus/here_doc_bonus.c \
+              bonus/pipex_modes_bonus.c \
               bonus/file_operations_bonus.c \
               get_next_line/get_next_line.c \
               get_next_line/get_next_line_utils.c

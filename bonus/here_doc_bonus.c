@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   file_operations.c                                  :+:      :+:    :+:   */
+/*   here_doc_bonus.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mustafa <mustafa@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,23 +12,29 @@
 
 #include "../pipex.h"
 #include "../libft/libft.h"
+#include "../get_next_line/get_next_line.h"
 
-int	open_input_file(char *filename)
+void	handle_here_doc(char *limiter, int *temp_pipefd)
 {
-	int	fd;
+	char	*line;
+	int		limiter_len;
 
-	fd = open(filename, O_RDONLY);
-	if (fd == -1)
-		perror(filename);
-	return (fd);
-}
-
-int	open_output_file(char *filename)
-{
-	int	fd;
-
-	fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd == -1)
-		perror(filename);
-	return (fd);
+	limiter_len = ft_strlen(limiter);
+	ft_putstr_fd("heredoc> ", STDERR_FILENO);
+	while (1)
+	{
+		line = get_next_line(STDIN_FILENO);
+		if (!line)
+			break ;
+		if (ft_strncmp(line, limiter, limiter_len) == 0
+			&& (line[limiter_len] == '\n' || line[limiter_len] == '\0'))
+		{
+			free(line);
+			break ;
+		}
+		ft_putstr_fd(line, temp_pipefd[1]);
+		free(line);
+		ft_putstr_fd("heredoc> ", STDERR_FILENO);
+	}
+	close(temp_pipefd[1]);
 }

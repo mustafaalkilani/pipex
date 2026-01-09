@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   process.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mustafa <mustafa@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/02 00:00:00 by malkilan          #+#    #+#             */
+/*   Updated: 2026/01/09 00:00:00 by mustafa          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../pipex.h"
 #include "../libft/libft.h"
 
@@ -79,6 +91,16 @@ static void	handle_path_command_error(char **cmd_args)
 	exit(127);
 }
 
+static void	handle_cmd_not_found(char *cmd, char **cmd_args)
+{
+	ft_putstr_fd("pipex: command not found: ", 2);
+	ft_putstr_fd(cmd_args[0], 2);
+	ft_putstr_fd("\n", 2);
+	(void)cmd;
+	free_split(cmd_args);
+	exit(127);
+}
+
 void	execute_command(char *cmd, char **envp)
 {
 	char	**cmd_args;
@@ -96,13 +118,7 @@ void	execute_command(char *cmd, char **envp)
 	if (!cmd_path)
 	{
 		if (ft_strchr(cmd_args[0], '/') == NULL)
-		{
-			ft_putstr_fd("pipex: command not found: ", 2);
-			ft_putstr_fd(cmd_args[0], 2);
-			ft_putstr_fd("\n", 2);
-			free_split(cmd_args);
-			exit(127);
-		}
+			handle_cmd_not_found(cmd, cmd_args);
 		handle_path_command_error(cmd_args);
 	}
 	execve(cmd_path, cmd_args, envp);

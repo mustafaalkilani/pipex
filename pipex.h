@@ -52,11 +52,19 @@ void	free_split(char **split);
 /*                              BONUS FUNCTIONS                               */
 /* ************************************************************************** */
 
+typedef struct s_pipex
+{
+	int		argc;
+	char	**argv;
+	char	**envp;
+	int		**pipes;
+	int		cmd_count;
+	int		is_here_doc;
+}	t_pipex;
+
 /* process_bonus.c */
-int		execute_multiple_commands(int argc, char **argv,
-			int **pipes, char **envp, int is_here_doc);
-void	execute_command_at_index(int index, int cmd_count,
-			char **argv, int **pipes, char **envp, int is_here_doc);
+int		execute_multiple_commands(t_pipex *px);
+void	execute_command_at_index(int index, t_pipex *px);
 void	handle_here_doc(char *limiter, int *temp_pipefd);
 
 /* file_operations_bonus.c */
