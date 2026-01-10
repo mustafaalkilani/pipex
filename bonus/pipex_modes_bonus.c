@@ -6,12 +6,13 @@
 /*   By: malkilan <malkilan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/03 00:00:00 by mustafa           #+#    #+#             */
-/*   Updated: 2026/01/10 13:22:30 by malkilan         ###   ########.fr       */
+/*   Updated: 2026/01/10 13:55:52 by malkilan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../pipex.h"
 #include "../libft/libft.h"
+#include "pipex_bonus.h"
 
 static int	**create_pipes(int pipe_count)
 {

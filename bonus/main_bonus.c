@@ -6,15 +6,13 @@
 /*   By: malkilan <malkilan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/03 00:00:00 by mustafa           #+#    #+#             */
-/*   Updated: 2026/01/10 13:22:26 by malkilan         ###   ########.fr       */
+/*   Updated: 2026/01/10 13:54:32 by malkilan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../pipex.h"
 #include "../libft/libft.h"
-
-int		run_here_doc_mode(int argc, char **argv, char **envp);
-int		run_normal_mode(int argc, char **argv, char **envp);
+#include "pipex_bonus.h"
 
 static int	is_here_doc_mode(char **argv)
 {

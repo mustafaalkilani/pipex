@@ -6,12 +6,13 @@
 /*   By: malkilan <malkilan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 00:00:00 by malkilan          #+#    #+#             */
-/*   Updated: 2026/01/10 13:22:13 by malkilan         ###   ########.fr       */
+/*   Updated: 2026/01/10 13:56:07 by malkilan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../pipex.h"
 #include "../libft/libft.h"
+#include "pipex_bonus.h"
 
 static void	close_all_pipes_in_child(int **pipes, int pipe_count)
 {

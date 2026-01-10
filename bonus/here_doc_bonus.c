@@ -6,13 +6,14 @@
 /*   By: malkilan <malkilan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 00:00:00 by malkilan          #+#    #+#             */
-/*   Updated: 2026/01/10 13:22:22 by malkilan         ###   ########.fr       */
+/*   Updated: 2026/01/10 13:55:59 by malkilan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../pipex.h"
 #include "../libft/libft.h"
 #include "../get_next_line/get_next_line.h"
+#include "pipex_bonus.h"
 
 void	handle_here_doc(char *limiter, int *temp_pipefd)
 {
